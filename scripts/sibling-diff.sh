@@ -10,6 +10,7 @@
 set -euo pipefail
 
 verbatim=(
+  .claude/rules/renovate.md
   .claude/rules/siblings.md
   scripts/sibling-diff.sh
 )
@@ -20,12 +21,23 @@ cli_identical=(
   .claude/rules/writing.md
   .gitattributes
   .github/jactionlint.yaml
+  .github/workflows/aube-lock.yml
   .github/workflows/ci.yml
+  .github/workflows/docs.yml
   .github/workflows/renovate-config.yml
   .github/workflows/renovate.yml
   .github/workflows/security.yml
   .golangci.yml
   .gitignore
+  docs/.oxfmtrc.json
+  docs/.vitepress/contrast.test.mjs
+  docs/.vitepress/llms.mts
+  docs/.vitepress/llms.test.mjs
+  docs/.vitepress/theme/index.ts
+  docs/.vitepress/tokens.mjs
+  docs/aube-workspace.yaml
+  mise.docs.lock
+  mise.docs.toml
   mise.lock
   release-please-config.json
   renovate.json
@@ -37,6 +49,8 @@ cli_identical=(
   internal/app/vt_windows.go
   internal/buildinfo/buildinfo.go
   internal/buildinfo/doc.go
+  internal/cli/annotations.go
+  internal/cli/annotations_test.go
   internal/cli/completion.go
   internal/cli/completion_test.go
   internal/cli/out.go
@@ -49,7 +63,11 @@ cli_identical=(
   internal/config/load.go
   internal/config/paths.go
   internal/config/schema_test.go
+  internal/config/template.go
   internal/config/validate.go
+  internal/docsurl/doc.go
+  internal/docsurl/docsurl.go
+  internal/docsurl/docsurl_test.go
   internal/execx/doc.go
   internal/execx/execx.go
   internal/execx/execx_test.go
@@ -107,11 +125,18 @@ cli_identical=(
   scripts/completion-shells.sh
   scripts/completions.sh
   scripts/fuzz.sh
+  scripts/gendocs/cli.go
   scripts/gendocs/doc.go
   scripts/gendocs/main.go
+  scripts/gendocs/main_test.go
+  scripts/gendocs/markdown.go
+  scripts/gendocs/mcp.go
+  scripts/gendocs/reference.go
+  scripts/gendocs/snippets.go
   scripts/licenses.sh
   scripts/proselint/doc.go
   scripts/proselint/main.go
+  scripts/proselint/main_test.go
   scripts/test-golden.sh
   testdata/script/completion.txtar
   testdata/script/root.txtar
@@ -133,6 +158,7 @@ cli_similar=(
   internal/cli/script_test.go
   internal/config/config.go
   internal/config/doc.go
+  internal/config/env.go
   internal/config/load_test.go
   docs/engineering/ci-and-release.md
   docs/engineering/stack.md
@@ -140,6 +166,10 @@ cli_similar=(
   docs/engineering/adr/0008-lint-config.md
   docs/engineering/adr/0013-shell-completion-and-man-pages.md
   docs/install.md
+  docs/package.json
+  docs/.vitepress/config.mts
+  docs/.vitepress/sidebar.mts
+  docs/engineering/adr/0016-docs-site.md
 )
 
 action_identical=(
