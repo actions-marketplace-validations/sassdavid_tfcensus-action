@@ -68,6 +68,20 @@ output() {
   fi
 }
 
+# older <a> <b>: version a comes before version b; both are X.Y.Z.
+older() {
+  local IFS=. i a b
+  read -r -a a <<<"$1"
+  read -r -a b <<<"$2"
+  for i in 0 1 2; do
+    if ((10#${a[i]} != 10#${b[i]})); then
+      ((10#${a[i]} < 10#${b[i]}))
+      return
+    fi
+  done
+  return 1
+}
+
 boolean() {
   case "$2" in
     true | false) ;;
@@ -102,6 +116,13 @@ case "$mode" in
     if [[ "$mode" == comment && "${GITHUB_EVENT_NAME:-}" != pull_request ]]; then
       die 2 "mode comment needs a pull_request event, not \"${GITHUB_EVENT_NAME:-}\""
     fi
+    # latest is never older, and install.sh rejects a version that isn't X.Y.Z.
+    pinned=${VERSION:-$TOOL_VERSION}
+    pinned=${pinned#v}
+    if [[ "$mode" == comment && -n "$TOOL_COMMENT_MIN_VERSION" && "$pinned" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] &&
+      older "$pinned" "$TOOL_COMMENT_MIN_VERSION"; then
+      die 2 "mode comment needs $TOOL_NAME $TOOL_COMMENT_MIN_VERSION or later, not $pinned"
+    fi
     [[ -d "$wd" ]] || die 2 "working-directory \"$wd\" is not a directory"
     ;;
   *) die 2 "mode must be install, report or comment, not \"$mode\"" ;;
@@ -130,8 +151,10 @@ dir=$(mktemp -d "${temp%/}/$TOOL_NAME-$command.XXXXXX")
 json=$dir/$command.json md=$dir/$command.md sarif_file=
 
 args=()
-if [[ "$mode" == comment && -n "$TOOL_COMMENT_FLAGS" ]]; then
-  read -r -a args <<<"$TOOL_COMMENT_FLAGS"
+# The comment flags of each command are in TOOL_COMMENT_FLAGS_<command>.
+flags_var=TOOL_COMMENT_FLAGS_$command
+if [[ "$mode" == comment && -n "${!flags_var:-}" ]]; then
+  read -r -a args <<<"${!flags_var}"
 fi
 if has "$command" "$TOOL_SARIF_COMMANDS"; then
   sarif_file=$dir/$command.sarif
